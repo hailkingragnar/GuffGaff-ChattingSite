@@ -1,0 +1,121 @@
+
+
+        body {
+            background-color: #f3f4f6;
+        }
+
+        /* Enhance the login section */
+        #loginSection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e5e7eb;
+        }
+
+        /* Left Panel (User List) */
+        .user-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .user-item img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-item .username {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-item .last-message {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Right Column (Chat Window) */
+        .chat-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+        }
+
+
+
+        /* Input Box Styling */
+        .message-input input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        .message-input button {
+            padding: 12px;
+            border-radius: 25px;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .message-input button:hover {
+            background-color: #128c7e;
+        }
+        /* Tailwind CSS classes for message styling */
+        .message {
+            max-width: 70%;
+            word-wrap: break-word;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Styling for sent messages */
+        .message-sent {
+            background-color: #34D399; /* Tailwind green */
+            color: white;
+            margin-left: auto; /* Align to the right */
+            border-radius: 20px 20px 0 20px;
+        }
+
+        /* Styling for received messages */
+        .message-received {
+            background-color: #E5E7EB; /* Tailwind light-gray */
+            color: black;
+            margin-right: auto; /* Align to the left */
+            border-radius: 20px 20px 20px 0;
+        }
+
+        /* Additional Styling for the Chat Box */
+        #chatBox {
+            div#chatBox {
+                height: 500px !important; /* Adjust the height as needed */
+                background-color: #f5f5f5; /* Optional: To visually confirm the style is applied */
+            }
+
+        }
