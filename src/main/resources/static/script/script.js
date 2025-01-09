@@ -77,6 +77,7 @@ function selectUser(user) {
     currentReceiver = user;
     document.getElementById('chatWith').textContent = user;
     document.getElementById('chatWindow').style.display = 'block';
+    loadMessages();
 }
 
 function sendMessage() {
@@ -124,6 +125,23 @@ function showMessage(message) {
 
     chatBox.innerHTML += messageHTML;
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+function loadMessages(){
+    document.getElementById('chatBox').innerHTML='';
+
+    fetch(`/messages?sender=${encodeURIComponent(username)}&receiver=${encodeURIComponent(currentReceiver)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Sort messages by date (oldest first)
+            data.sort((a, b) => new Date(a.dateAndTime) - new Date(b.dateAndTime));
+
+            data.forEach((message) => {
+                showMessage(message);
+            });
+
+        }).catch(error => {
+            console.error("Error parsing message:", error);
+    })
 }
 
 
