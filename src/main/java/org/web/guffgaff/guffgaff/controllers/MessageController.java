@@ -40,7 +40,8 @@ public class MessageController {
 
         message.setMessage(EncryptionUtil.encrypt(message.getMessage()));
         message.setDate(LocalDateTime.now());
-
+        message.setSender(principal.getName());
+        message.setReceiver(message.getReceiver());
         messageRepo.save(message);
         message.setMessage(EncryptionUtil.decrypt(message.getMessage()));
         messagingTemplate.convertAndSendToUser(message.getReceiver(), "/queue/messages", message);
@@ -56,13 +57,18 @@ public class MessageController {
     public String chat() {
         return "Index";
     }
+    @RequestMapping("/home")
+    public String home(){
+        return "home";
+    }
 
     @GetMapping("/messages")
     @ResponseBody
-    public List<Message> getMessages(@RequestParam String sender, @RequestParam String receiver){
+    public List<Message> getMessages(@RequestParam String sender, @RequestParam String receiver , Principal principal) {
         Message message = new Message();
-        String decSender = URLDecoder.decode(sender, StandardCharsets.UTF_8);
+       // String decSender = URLDecoder.decode(sender, StandardCharsets.UTF_8);
         String decReceiver = URLDecoder.decode(receiver, StandardCharsets.UTF_8);
+        String decSender = principal.getName();
         List<Message> messagesSent = messageRepo.findBySenderAndReceiver(decSender, decReceiver);
            for (Message messageSent : messagesSent) {
                messageSent.setMessage(EncryptionUtil.decrypt(messageSent.getMessage()));

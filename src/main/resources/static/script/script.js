@@ -2,9 +2,32 @@ let stompClient;
 let currentReceiver = '';
     let username = '';
 
+/*window.onload = function() {
+    // Get the session cookie automatically included in HTTP requests
+    const sessionCookie = getSessionCookie();  // Custom function to retrieve session cookie (if needed)
+
+    if (sessionCookie) {
+        connect();  // Trigger WebSocket connection
+    } else {
+        console.log("User is not authenticated.");
+    }
+}*/
+/* window.onload = function() {
+    // Get the current URL path
+    const currentPath = window.location.pathname;
+
+    // Check if the path is '/home'
+    if (currentPath === '/guffgaff') {
+        connect();
+
+    } else {
+        console.log("Not on /home page, skipping...");
+    }
+}; */
+
 function connect() {
     console.log('Connecting to WebSocket...');
-    const socket = new SockJS(`/chat?username=${encodeURIComponent(username)}`);
+    const socket = new SockJS(`/chat`);
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
@@ -30,39 +53,20 @@ function connect() {
     });
 }
 
-function login() {
-    console.log('Inside login...');
-
-     username = document.getElementById('username').value;
-    console.log("Attempting to log in with username:", username);
-
-    // Send login request
-    fetch(`/login?username=${username}`, { method: 'POST' })
-        .then(response => response.text())
-        .then(data => {
-            console.log("Login response data: " + data);
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('chatSection').style.display = 'block';
-            connect(); // Establish WebSocket connection
-        })
-        .catch(error => {
-            console.error("Error during login request: ", error);
-        });
-}
 
 function fetchUsers() {
     console.log('Fetching online users...');
     fetch('/users')
         .then(response => response.json())
-        .then(users => {
-            console.log("Received users: ", users);
+        .then(usernames => {
+            console.log("Received users: ", usernames);
             const userList = document.getElementById('users');
             userList.innerHTML = '';
-            users.forEach(user => {
+            usernames.forEach(username => {
                 const li = document.createElement('li');
-                li.textContent = user;
+                li.textContent = username;
                 li.onclick = function () {
-                    selectUser(user);
+                    selectUser(username);
                 };
                 userList.appendChild(li);
             });
@@ -71,7 +75,6 @@ function fetchUsers() {
             console.error("Error fetching users: ", error);
         });
 }
-
 function selectUser(user) {
     console.log("User selected: ", user);
     currentReceiver = user;
@@ -86,7 +89,6 @@ function sendMessage() {
 
     if (stompClient && message) {
         const messageData = {
-            'sender': username,
             'receiver': currentReceiver,
             'message': message
         };
@@ -143,5 +145,46 @@ function loadMessages(){
             console.error("Error parsing message:", error);
     })
 }
+
+async function login(){
+    console.log('Logging  in users...');
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    console.log(`The username is : ${username}+"The password is : ${password}`);
+    try {
+        const response = await fetch(`/api/v1/authenticate`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: username, password: password})
+        })
+        console.log(`The response is ${await response.json()}`);
+        console.log(`The response is ${response.status}`);
+        // Step 2: Check if the response is OK
+        if (!response.ok) {
+            alert("Invalid Username or password");
+            throw new Error('Login failed: Invalid credentials or server error');
+        }
+
+        // Step 3: Parse the response to JSON
+        const data = await response.json();
+
+        // Step 4: Save the token in localStorage
+        localStorage.setItem('jwtToken', data.token);
+        console.log(data.token);
+        console.log('Login successful, token saved');
+        window.location.href = '/guffgaff';
+        connect();
+    }catch (error) {
+        if (error.name === 'AbortError') {
+            console.error("Request timed out");
+            alert("Request timed out. Please try again.");
+        } else {
+            // Log the error and show a generic error message
+            console.error("Error logging in:", error);
+            alert(error.message || "An error occurred while logging in.");
+        }
+    }
+}
+
 
 

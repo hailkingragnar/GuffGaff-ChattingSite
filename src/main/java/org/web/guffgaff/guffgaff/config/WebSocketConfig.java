@@ -18,18 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat")
-                .setHandshakeHandler(new DefaultHandshakeHandler() {
-
-                    @Override
-                    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler webSocketHandler, Map<String, Object> attributes) {
-                        // Assign a Principal using the username from attributes
-                        String username = (String) attributes.get("username");
-                        System.out.println("Frm Class websocketconfig"+username);
-                        return () -> username;
-
-                        // Create a Principal with the username
-                    }
-                })
+                .setHandshakeHandler(new DefaultHandshakeHandler())
                 .addInterceptors(new CustomHandshakeInterceptor())
                 .withSockJS();
     }
