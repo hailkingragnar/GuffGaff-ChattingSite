@@ -146,45 +146,71 @@ function loadMessages(){
     })
 }
 
-async function login(){
-    console.log('Logging  in users...');
+async function login(event) {
+    event.preventDefault();
+    console.log('Logging in user...');
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    console.log(`The username is : ${username}+"The password is : ${password}`);
+
+    console.log(`The username is: ${username}, The password is: ${password}`);
+
     try {
-        const response = await fetch(`/api/v1/authenticate`, {
+        const response = await fetch(`http://localhost:8080/api/v1/authenticate`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: username, password: password})
-        })
-        console.log(`The response is ${await response.json()}`);
-        console.log(`The response is ${response.status}`);
-        // Step 2: Check if the response is OK
+            body: JSON.stringify({username, password})
+        });
+
         if (!response.ok) {
-            alert("Invalid Username or password");
-            throw new Error('Login failed: Invalid credentials or server error');
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // Step 3: Parse the response to JSON
-        const data = await response.json();
+        const data = await response.json();  // Await the JSON response
+        console.log('Response:', data);
 
-        // Step 4: Save the token in localStorage
-        localStorage.setItem('jwtToken', data.token);
-        console.log(data.token);
-        console.log('Login successful, token saved');
-        window.location.href = '/guffgaff';
-        connect();
-    }catch (error) {
-        if (error.name === 'AbortError') {
-            console.error("Request timed out");
-            alert("Request timed out. Please try again.");
-        } else {
-            // Log the error and show a generic error message
-            console.error("Error logging in:", error);
-            alert(error.message || "An error occurred while logging in.");
+        // Store token if it exists
+        if (data.token) {
+            localStorage.setItem('authToken', data.token);
+            console.log('Token saved successfully!');
+
+            guffGaff();
+
         }
+    } catch (error) {
+        console.error('Error authenticating:', error);
     }
 }
+document.getElementById('login-button').addEventListener('click', login);
 
+
+function guffGaff() {
+    const jwtToken = localStorage.getItem('authToken');
+
+    if (!jwtToken) {
+        window.location.href = "/login"
+    }
+
+// Send the request with Bearer token
+    fetch('/guffgaff', {
+        method: 'GET',  // Or POST depending on your endpoint
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            // Any other necessary headers
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+              console.log('Response:', response);
+
+            } else {
+                // Handle errors (e.g., invalid token)
+                console.error('Authentication failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
 
 

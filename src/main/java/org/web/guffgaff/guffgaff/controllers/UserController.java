@@ -1,6 +1,7 @@
 package org.web.guffgaff.guffgaff.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -72,7 +73,7 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/api/v1/authenticate")
-    public LoginResponse loginResponse(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<?> loginResponse(@RequestBody LoginDTO loginDTO) {
         System.out.println("Inside Login response "+loginDTO);
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -81,10 +82,10 @@ public class UserController {
             System.out.println("Inside Login response "+ authentication.getName());
             String token = jwtUtils.generateToken(authentication.getName());
             System.out.println("Inside Login response "+ token);
-            return new LoginResponse(token,"Successfull",loginDTO.getUsername());
+            return ResponseEntity.ok(new LoginResponse(token,"Successfull",loginDTO.getUsername()));
 
         }catch (Exception e){
-            throw new RuntimeException("Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 }
