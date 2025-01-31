@@ -175,6 +175,7 @@ async function login(event) {
             console.log('Token saved successfully!');
 
             guffGaff();
+            connect();
 
         }
     } catch (error) {
@@ -199,14 +200,10 @@ function guffGaff() {
             // Any other necessary headers
         }
     })
-        .then(response => {
-            if (response.ok) {
-              console.log('Response:', response);
+        .then(response => response.text())
+        .then(html => {
+            document.body.innerHTML = html; // Replace entire page with the new view
 
-            } else {
-                // Handle errors (e.g., invalid token)
-                console.error('Authentication failed');
-            }
         })
         .catch(error => {
             console.error('Error:', error);
