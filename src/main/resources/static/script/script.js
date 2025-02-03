@@ -24,6 +24,18 @@ let currentReceiver = '';
         console.log("Not on /home page, skipping...");
     }
 }; */
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+
+    if (currentPath === '/guffgaff') {
+        if (typeof SockJS !== 'undefined' && typeof Stomp !== 'undefined') {
+            connect();
+        } else {
+            console.log('SockJS or Stomp is not loaded yet.');
+        }
+    }
+});
+
 
 function connect() {
     console.log('Connecting to WebSocket...');
@@ -171,11 +183,8 @@ async function login(event) {
 
         // Store token if it exists
         if (data.token) {
-            localStorage.setItem('authToken', data.token);
-            console.log('Token saved successfully!');
 
-            guffGaff();
-            connect();
+          window.location.href = "/guffgaff";
 
         }
     } catch (error) {
@@ -185,29 +194,30 @@ async function login(event) {
 document.getElementById('login-button').addEventListener('click', login);
 
 
-function guffGaff() {
-    const jwtToken = localStorage.getItem('authToken');
+    async function logout() {
+        console.log('Logging out user...');
 
-    if (!jwtToken) {
-        window.location.href = "/login"
-    }
+        try {
+            // Call backend to logout and clear cookie
+            const response = await fetch('http://localhost:8080/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-// Send the request with Bearer token
-    fetch('/guffgaff', {
-        method: 'GET',  // Or POST depending on your endpoint
-        headers: {
-            'Authorization': `Bearer ${jwtToken}`,
-            // Any other necessary headers
+            if (response.ok) {
+                console.log('Logout successful!');
+                // Redirect user to login page or any other page after logout
+                window.location.href = '/login';
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error logging out:', error);
         }
-    })
-        .then(response => response.text())
-        .then(html => {
-            document.body.innerHTML = html; // Replace entire page with the new view
-
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
 }
+
+
 
 

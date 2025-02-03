@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.web.guffgaff.guffgaff.utils.JWTUtils;
 
 import java.security.Principal;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat")
                 .setHandshakeHandler(new DefaultHandshakeHandler())
-                .addInterceptors(new CustomHandshakeInterceptor())
+                .addInterceptors(new CustomHandshakeInterceptor(new JWTUtils()))
                 .withSockJS();
     }
 
